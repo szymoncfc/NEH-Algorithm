@@ -2,6 +2,7 @@
 #include<vector>
 #include<math.h>
 #include<limits.h>
+#include <fstream>
 
 using namespace std;
 
@@ -9,12 +10,11 @@ using namespace std;
 class Zadanie{
     public:
     int numer;
-    int m1,m2,m3;
+    //int m1,m2,m3;
+    vector<int>maszyny;
 
-    Zadanie(int a, int b, int c ,int d){
-        m1= a;
-        m2= b;
-        m3= c; 
+    Zadanie(int d){
+
         numer= d;
     }
 
@@ -32,8 +32,9 @@ int zwroc_max(){
    int indeks_max= 0;
 
     for(int i=0; i<zadania.size(); i++){
-        sum= zadania[i].m1 + zadania[i].m2 + zadania[i].m3;
-        
+        for(int j=0; j<zadania[i].maszyny.size(); j++){
+        sum += zadania[i].maszyny[j];
+        }
     
         if(sum > max){
             max= sum;
@@ -48,16 +49,28 @@ int zwroc_max(){
 
 int main(){
 
-Zadanie  a(1,1,3,1); // 5
-Zadanie  b(4,1,2,2); // 7
-Zadanie  c(3,4,3,3); // 10
-Zadanie  d(2,4,1,4); // 7
+ifstream Data ("data.txt");
+int N, M, zad;
+Data >> N;
+Data >> M;
+for(int i=0;i<N;i++){
+Zadanie a(i);
+  for (int j=0;j<M;j++){  
+  Data >> zad;
+  a.maszyny.push_back(zad);
+  }
+  zadania.push_back(a);
+}
+//Zadanie  a(1,1,3,1); // 5
+//Zadanie  b(4,1,2,2); // 7
+//Zadanie  c(3,4,3,3); // 10
+//Zadanie  d(2,4,1,4); // 7
 
 
-zadania.push_back(a);
-zadania.push_back(b);
-zadania.push_back(c);
-zadania.push_back(d);
+//zadania.push_back(a);
+//zadania.push_back(b);
+//zadania.push_back(c);
+//zadania.push_back(d);
 
 
 //obliczamy łączny czas
@@ -104,34 +117,41 @@ for(int j=0; j<liczba_zadan; j++){
         }
 
         zad_m1=0, zad_m2=0, zad_m3=0;
+        int zad_maszyny[temp[0].maszyny.size()-1];
         //cmax=INT_MAX;
         cout <<endl;
         for(int a=0;a<temp.size();a++){
-        //for(int m=0;m<3;m++){
+            for(int m=0;m<temp[a].maszyny.size();m++){
             if(a==0){
-                zad_m1=temp[a].m1;
+                if(m==0)zad_maszyny[0]=temp[a].maszyny[m];
+                else{
+                    zad_maszyny[m]=temp[a].maszyny[m]+zad_maszyny[m-1];
+                }
                 //cout<<"zad_m1 = " << zad_m1 << endl;
-                zad_m2=temp[a].m2+zad_m1;
+                //zad_m2=temp[a].m2+zad_m1;
                 //cout<<"zad_m2 = " << zad_m2 << endl;
-                zad_m3=temp[a].m3+zad_m2;
+                //zad_m3=temp[a].m3+zad_m2;
                 //cout<<"zad_m3 = " << zad_m3 << endl;
             }
             else{
-                zad_m1 = max(0,zad_m1) + temp[a].m1;
+                if(m==0)zad_maszyny[0] = max(0,zad_maszyny[0]) + temp[a].maszyny[m];
+                else{
+                    zad_maszyny[m] = max(zad_maszyny[m-1],zad_maszyny[m]) + temp[a].maszyny[m];
+                }
                 //cout<<"zad_m1 = " << zad_m1 << endl;
-                zad_m2 = max(zad_m1,zad_m2) + temp[a].m2;
+                //zad_m2 = max(zad_m1,zad_m2) + temp[a].m2;
                 //cout<<"zad_m2 = " << zad_m2 << endl;
-                zad_m3 = max(zad_m2, zad_m3) + temp[a].m3;
+                //zad_m3 = max(zad_m2, zad_m3) + temp[a].m3;
                 //cout<<"zad_m3 = " << zad_m3 << endl;
                 }
-            //}
+            }
 
         }
         //cmax=zad_m3;
         cout<<endl;
-        cout<< "Cmax: "<< zad_m3 << endl;
-        if(zad_m3<cmax){
-            cmax=zad_m3;
+        cout<< "Cmax: "<< zad_maszyny[temp[0].maszyny.size()-1] << endl;
+        if(zad_maszyny[temp[0].maszyny.size()-1]<cmax){
+            cmax=zad_maszyny[temp[0].maszyny.size()-1];
             uszeregowanie.clear();
             for(int b=0;b<temp.size();b++){
                 uszeregowanie.push_back(temp[b]);
